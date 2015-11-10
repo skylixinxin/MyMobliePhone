@@ -35,7 +35,7 @@ public class SampleGridePagerAdapter extends FragmentGridPagerAdapter{
     }
 
     private Page[] pagerow = {new Page(), new Page(), new Page()};
-    private final Page[][] PAGES = {pagerow, pagerow, pagerow};
+    private final Page[][] PAGES = {pagerow, pagerow, pagerow,pagerow,pagerow};
 
     public SampleGridePagerAdapter(Context context,FragmentManager fm) {
         super(fm);
