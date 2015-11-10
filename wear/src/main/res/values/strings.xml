@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">MyMobliePhone</string>
+    <string name="hello_round">Hello Round World!</string>
+    <string name="hello_square">Hello Square World!</string>
+    <string name="show_notification">Notification</string>
+    <integer name="action_text_fade_alpha">80</integer>
+</resources>

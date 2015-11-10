@@ -1,0 +1,36 @@
+apply plugin: 'com.android.application'
+
+
+android {
+    signingConfigs {
+        keystore {
+            keyAlias 'Test'
+            keyPassword 'lixinxin'
+            storeFile file('/Users/lixinxin/MyMobliePhone/wear/keystore.jks')
+            storePassword 'lixinxin'
+        }
+    }
+    compileSdkVersion 23
+    buildToolsVersion "23.0.0"
+    defaultConfig {
+        applicationId "main.demon.material.com.mymobliephone"
+        minSdkVersion 19
+        targetSdkVersion 23
+        versionCode 1
+        versionName "1.0"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.keystore
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile files('libs/mobvoi-api.jar')
+    compile 'com.google.android.support:wearable:1.3.0'
+    compile 'com.google.android.gms:play-services:8.1.0'
+}

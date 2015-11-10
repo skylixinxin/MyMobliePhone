@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">MyMobliePhone</string>
+    <string name="action_settings">Settings</string>
+    <string name="reply_label">Reply</string>
+    <string name="show_notification">Show the new notification</string>
+    <string name="show_stack_notification">Show stacking notification</string>
+    <string name="message_request">Message Request</string>
+    <string name="data_map_request">Data Map Request</string>
+    <string name="data_changed">Data Changed</string>
+</resources>
