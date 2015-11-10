@@ -1,6 +1,7 @@
 package main.demon.material.com.mymobliephone;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.wearable.view.DelayedConfirmationView;
 import android.support.wearable.view.WatchViewStub;
@@ -44,19 +45,25 @@ public class WatchActivity extends Activity{
         delayedView.setListener(new DelayedConfirmationView.DelayedConfirmationListener() {
             @Override
             public void onTimerFinished(View view) {
-                showOnlyButton();
+                grideIntent();
             }
 
             @Override
             public void onTimerSelected(View view) {
+                showOnlyButton();
             }
         });
         delayedView.start();
     }
 
     public void showOnlyButton() {
-        button.setVisibility(View.VISIBLE);
         delayedView.setVisibility(View.GONE);
+        button.setVisibility(View.VISIBLE);
+    }
+
+    public void grideIntent(){
+        Intent intent = new Intent(this,GridActivity.class);
+        startActivity(intent);
     }
 
 }

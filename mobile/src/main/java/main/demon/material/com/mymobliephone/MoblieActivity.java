@@ -72,9 +72,6 @@ public class MoblieActivity extends FragmentActivity implements DataApi.DataList
 
     public void onStartWearableActivityClick(View view) {
         Log.d(TAG, "Generating RPC");
-
-        // Trigger an AsyncTask that will query for a list of connected nodes and send a
-        // "start-activity" message to each connected node.
         new StartWearableActivityTask().execute();
     }
 
@@ -99,6 +96,66 @@ public class MoblieActivity extends FragmentActivity implements DataApi.DataList
     public void sendData(View view) {
         dataThread.run();
 //        DataApiRequest();
+    }
+
+    public void sendNotification(View view) {
+        String toSend = editText.getText().toString();
+        String replyLabel = getResources().getString(R.string.reply_label);
+        RemoteInput remoteInput = new RemoteInput.Builder(EXTRA_VOICE_REPLY).setLabel(replyLabel).build();
+        if (TextUtils.isEmpty(toSend)) {
+            toSend = "You sent an empty notification.";
+        }
+        Intent intent = new Intent(this, DetailActivity.class);
+        intent.putExtra("send", toSend);
+        Intent replyIntent = new Intent(this, ReplyActivity.class);
+        NotificationCompat.BigTextStyle secondPageStyle = new NotificationCompat.BigTextStyle();
+        secondPageStyle.setBigContentTitle("Page 2")
+                .bigText(pageContent);
+        Notification secondPageNotification = new NotificationCompat.Builder(this).setStyle(secondPageStyle).build();
+        PendingIntent replyPendingIntent = PendingIntent.getActivity(this, 0, replyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        NotificationCompat.Action action = new NotificationCompat.Action.Builder(R.drawable.ic_yoyo, getString(R.string.reply_label),
+                replyPendingIntent).addRemoteInput(remoteInput).build();
+        Notification notification = new NotificationCompat.Builder(getApplication())
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_maoyan))
+                .setContentTitle("Android Wear小试身手。。。啦啦啦")
+                .setContentText(toSend)
+                .setContentIntent(PendingIntent.getActivity(this, 0, intent, 0))
+                .extend(new NotificationCompat.WearableExtender()
+                        .setBackground(BitmapFactory.decodeResource(getResources(), R.drawable.bg_welcome_default))
+                        .addAction(action)
+                        .addPage(secondPageNotification))
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(toSend))
+                .build();
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplication());
+        notificationManager.notify(notificationId, notification);
+    }
+
+    public void sendStackNotification(View view) {
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+        for (int i = 0; i < 4; i++) {
+            Notification notif = new NotificationCompat.Builder(this)
+                    .setContentTitle("News from 猫眼电影")
+                    .setContentText(pageContent)
+                    .setSmallIcon(R.drawable.ic_maoyan)
+                    .setGroup(GROUP_KEY_EMAILS)
+                    .build();
+            notificationManager.notify(notificationId1, notif);
+            notificationId1++;
+        }
+
+    }
+
+    private Collection<String> getNodes() {
+        HashSet<String> results = new HashSet<String>();
+        NodeApi.GetConnectedNodesResult nodes =
+                Wearable.NodeApi.getConnectedNodes(mGoogleAppiClient).await();
+
+        for (Node node : nodes.getNodes()) {
+            results.add(node.getId());
+        }
+
+        return results;
     }
 
     @Override
@@ -204,54 +261,6 @@ public class MoblieActivity extends FragmentActivity implements DataApi.DataList
         super.onStop();
     }
 
-    public void sendNotification(View view) {
-        String toSend = editText.getText().toString();
-        String replyLabel = getResources().getString(R.string.reply_label);
-        RemoteInput remoteInput = new RemoteInput.Builder(EXTRA_VOICE_REPLY).setLabel(replyLabel).build();
-        if (TextUtils.isEmpty(toSend)) {
-            toSend = "You sent an empty notification.";
-        }
-        Intent intent = new Intent(this, DetailActivity.class);
-        intent.putExtra("send", toSend);
-        Intent replyIntent = new Intent(this, ReplyActivity.class);
-        NotificationCompat.BigTextStyle secondPageStyle = new NotificationCompat.BigTextStyle();
-        secondPageStyle.setBigContentTitle("Page 2")
-                .bigText(pageContent);
-        Notification secondPageNotification = new NotificationCompat.Builder(this).setStyle(secondPageStyle).build();
-        PendingIntent replyPendingIntent = PendingIntent.getActivity(this, 0, replyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        NotificationCompat.Action action = new NotificationCompat.Action.Builder(R.drawable.ic_yoyo, getString(R.string.reply_label),
-                replyPendingIntent).addRemoteInput(remoteInput).build();
-        Notification notification = new NotificationCompat.Builder(getApplication())
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_maoyan))
-                .setContentTitle("Android Wear小试身手。。。啦啦啦")
-                .setContentText(toSend)
-                .setContentIntent(PendingIntent.getActivity(this, 0, intent, 0))
-                .extend(new NotificationCompat.WearableExtender()
-                        .setBackground(BitmapFactory.decodeResource(getResources(), R.drawable.bg_welcome_default))
-                        .addAction(action)
-                        .addPage(secondPageNotification))
-                .setStyle(new NotificationCompat.BigTextStyle().bigText(toSend))
-                .build();
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplication());
-        notificationManager.notify(notificationId, notification);
-    }
-
-    public void sendStackNotification(View view) {
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-        for (int i = 0; i < 4; i++) {
-            Notification notif = new NotificationCompat.Builder(this)
-                    .setContentTitle("News from 猫眼电影")
-                    .setContentText(pageContent)
-                    .setSmallIcon(R.drawable.ic_maoyan)
-                    .setGroup(GROUP_KEY_EMAILS)
-                    .build();
-            notificationManager.notify(notificationId1, notif);
-            notificationId1++;
-        }
-
-    }
-
     private class StartWearableActivityTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... params) {
@@ -336,16 +345,4 @@ public class MoblieActivity extends FragmentActivity implements DataApi.DataList
 //            }
 //        });
 //    }
-
-    private Collection<String> getNodes() {
-        HashSet<String> results = new HashSet<String>();
-        NodeApi.GetConnectedNodesResult nodes =
-                Wearable.NodeApi.getConnectedNodes(mGoogleAppiClient).await();
-
-        for (Node node : nodes.getNodes()) {
-            results.add(node.getId());
-        }
-
-        return results;
-    }
 }

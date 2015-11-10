@@ -3,5 +3,10 @@
     <string name="hello_round">Hello Round World!</string>
     <string name="hello_square">Hello Square World!</string>
     <string name="show_notification">Notification</string>
+    <string name="titleRes">Creating a 2D Picker</string>
+    <string name="textRes">The 2D Picker pattern in Android Wear allows users to navigate and choose from a set of items shown as pages.
+        The Wearable UI Library lets you easily implement this pattern using a page grid, which is a layout manager that allows users to
+        scroll vertically and horizontally through pages of data.
+    </string>
     <integer name="action_text_fade_alpha">80</integer>
 </resources>
