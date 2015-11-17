@@ -29,7 +29,7 @@ import main.demon.material.com.mymobliephone.MessageActivity;
  */
 public class DataLayerListenerService extends WearableListenerService {
 
-    private static final String TAG = "DataLayerListenerServic";
+    private static final String TAG = "DataLayerService";
     private static final String START_ACTIVITY_PATH = "/start-activity";
     private static final String START_DATAACTIVITY_PATH = "/start-dataactivity";
     private static final String DATA_ITEM_RECEIVED_PATH = "/data-item-received";
@@ -38,7 +38,8 @@ public class DataLayerListenerService extends WearableListenerService {
     private static final int MAX_LOG_TAG_LENGTH = 23;
     public static GoogleApiClient mGoogleApiClient;
     private ActivityManager mActivityManager;
-    private String mPackageName ="main.demon.material.com.mymobliephone";
+    private String mPackageName ="main.demon.material.com.mymobliephone.DataActivity";
+    public static String dataBroadcast= "DataLayerListenerService.data.Broadcast";
 
     @Override
     public void onCreate() {
@@ -83,10 +84,14 @@ public class DataLayerListenerService extends WearableListenerService {
                 Wearable.MessageApi.sendMessage(mGoogleApiClient, nodeId, DATA_ITEM_RECEIVED_PATH,
                         payload);
                 if (data.length > 0) {
-                    Intent intent = new Intent(this, DataActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    intent.putExtra("data", data);
-                    startActivity(intent);
+                    if (isAppOnForeground()){
+                        SendServiceBroadCast(data);
+                    }else {
+                        Intent intent = new Intent(this, DataActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        intent.putExtra("data", data);
+                        startActivity(intent);
+                    }
                 }
 //                if (count == 10)
 ////                if (count.equals("10"))
@@ -125,4 +130,24 @@ public class DataLayerListenerService extends WearableListenerService {
         super.onPeerDisconnected(peer);
         Log.d(TAG, "onPeerDisconnected:" + peer);
     }
+
+    public void SendServiceBroadCast(String[] data){
+        Intent intent = new Intent();
+        intent.setAction(dataBroadcast);
+        intent.putExtra("datachanged", data);
+        sendBroadcast(intent);
+    }
+
+
+    public boolean isAppOnForeground() {
+        List<ActivityManager.RunningTaskInfo> tasksInfo = mActivityManager.getRunningTasks(1);
+        if (tasksInfo.size() > 0) {
+            // 应用程序位于堆栈的顶层
+            if (mPackageName.equals(tasksInfo.get(0).topActivity.getClassName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }
